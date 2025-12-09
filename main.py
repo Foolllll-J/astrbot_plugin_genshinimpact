@@ -1,61 +1,26 @@
-import logging
 import random
-import requests  # 导入requests库
+import time
 from typing import List, Dict, Optional
+from astrbot import logger
 from astrbot.api.star import Context, Star, register
 from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
 from astrbot.api.event.filter import event_message_type, EventMessageType
 
-
-logger = logging.getLogger(__name__)
-
-ys_text_list = [
-    "你说的对，但是《原神》是由米哈游自主研发的一款全新开放世界冒险游戏。游戏发生在一个被称作「提瓦特」的幻想世界，在这里，被神选中的人将被授予「神之眼」，导引元素之力。你将扮演一位名为「旅行者」的神秘角色，在自由的旅行中邂逅性格各异、能力独特的同伴们，和他们一起击败强敌，找回失散的亲人——同时，逐步发掘「原神」的真相。",
-    "原神，启动！",
-    "旅行者，我们走！",
-    "啊？你在做什么啊？",
-    "不要过来啊！",
-    # 在这里添加更多从网上找到的“原神圣经”
-    "只要抽不死，就往死里抽！",
-    "呜呜呜，我的保底没了！",
-    "旅行者，你知道吗？派蒙其实是……",
-    "今天你充值了吗？",
-    "刻晴，我的刻晴！",
-    "甘雨，嘿嘿，甘雨……",
-    "抽卡一时爽，一直抽卡一直爽！",
-    "提瓦特大陆欢迎你！",
-    "元素反应，启动！",
-    "这合理吗？",
-    "策划我***！",
-    "米哈游，你没有心！",
-    "哎嘿~",
-    "旅行者，我们去下一个国家吧！",
-    "等我攒够原石，一定把你带回家！",
-    "我与提瓦特众生为敌！",
-    "旅行者，前方高能！",
-    "是风！",
-    "旅行者，你知道星尘商店吗？",
-    "感谢米哈游，让我体验到这么棒的游戏！",
-    "再氪亿点！",
-    "我的钱包已经空了……",
-    "原神真好玩！",
-    "呜呜呜，又歪了……",
-    "旅行者，快去完成每日委托吧！",
-    "又是美好的一天，从原神开始！"
-]
-
-@register("astrbot_plugin_genshinimpact", "ましろSaber&Foolllll", "一个原神启动插件", "1.2", "https://github.com/Foolllll-J/astrbot_plugin_genshinimpact")
+@register("astrbot_plugin_genshinimpact", "ましろSaber&Foolllll", "一个原神启动插件", "1.3", "https://github.com/Foolllll-J/astrbot_plugin_genshinimpact")
 class GenshinImpactPlugin(Star):
     def __init__(self, context: Context, config: Optional[Dict] = None):
         super().__init__(context)
         self.config = config if config else {}
         self.group_whitelist: List[int] = self.config.get("group_whitelist", [])
         self.group_whitelist = [int(gid) for gid in self.group_whitelist]
+        self.ys_quotes: List[str] = self.config.get("ys_quotes", [])
+        self.cooldown: int = self.config.get("cooldown", 0)
+        self.last_trigger_time: Dict[str, float] = {}  # 存储每个群的最后触发时间
 
     @event_message_type(EventMessageType.ALL)
     async def on_message(self, event: AstrMessageEvent) -> MessageEventResult:
         """
-        当消息中包含“原神”时随机发送一条圣经。
+        当消息中包含"原神"时随机发送一条圣经。
         """
         group_id_str = event.get_group_id()
         if group_id_str:  # 如果是群聊
@@ -79,6 +44,24 @@ class GenshinImpactPlugin(Star):
         logger.debug("============================")
 
         if "原神" in text and not event.is_at_or_wake_command:
+            # 检查冷却时间
+            session_id = msg_obj.session_id
+            current_time = time.time()
+            
+            if self.cooldown > 0 and session_id in self.last_trigger_time:
+                elapsed = current_time - self.last_trigger_time[session_id]
+                if elapsed < self.cooldown:
+                    logger.debug(f"原神触发被冷却限制，剩余冷却时间：{self.cooldown - elapsed:.1f}秒")
+                    return
+            
+            # 检查是否有配置的语录
+            if not self.ys_quotes:
+                logger.warning("原神语录列表为空，插件将不会回复")
+                return
+            
+            # 更新最后触发时间
+            self.last_trigger_time[session_id] = current_time
+            
             # 随机抽取一条圣经
-            selected_text = random.choice(ys_text_list)
+            selected_text = random.choice(self.ys_quotes)
             yield event.plain_result(selected_text)
