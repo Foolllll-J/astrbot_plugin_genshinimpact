@@ -1,13 +1,20 @@
+<div align="center">
+
 # 🎮 原神启动插件
+
+<i>🌟 原神，启动！</i>
 
 ![License](https://img.shields.io/badge/license-AGPL--3.0-green?style=flat-square)
 ![Python](https://img.shields.io/badge/python-3.10+-blue?style=flat-square&logo=python&logoColor=white)
 ![AstrBot](https://img.shields.io/badge/framework-AstrBot-ff6b6b?style=flat-square)
 
+</div>
 
-一款为 [AstrBot](https://github.com/AstrBotDevs/AstrBot) 设计的原神启动插件，当检测到"原神"关键词时自动回复原神圣经语录
+---
 
+## 📖 简介
 
+一款为 [**AstrBot**](https://github.com/AstrBotDevs/AstrBot) 设计的原神启动插件，当检测到“原神”关键词时自动回复原神圣经语录。
 
 ---
 
@@ -40,9 +47,15 @@
 
 ---
 
+## ❤️ 支持
+
+* [AstrBot 帮助文档](https://astrbot.app)
+* 如果您在使用中遇到问题，欢迎在本仓库提交 [Issue](https://github.com/Foolllll-J/astrbot_plugin_genshinimpact/issues)。
+
+---
+
 <div align="center">
 
 **觉得好用的话，给个 ⭐ Star 吧！**
 
 </div>
-

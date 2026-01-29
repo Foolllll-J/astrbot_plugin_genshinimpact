@@ -48,5 +48,11 @@
         "hint": "距离上次触发原神圣经的冷却时间，0表示不限制。设置冷却可防止正常讨论原神时被频繁打断",
         "type": "int",
         "default": 0
+    },
+    "ignore_cooldown_on_exact_match": {
+        "description": "完全匹配时无视冷却",
+        "hint": "如果消息内容仅为“原神”两个字，则无视冷却时间发送圣经",
+        "type": "bool",
+        "default": false
     }
 }
